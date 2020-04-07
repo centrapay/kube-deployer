@@ -37,6 +37,21 @@ ENV IAM_AUTHENTICATOR_VERSION="1.15.10/2020-02-22"
 ADD https://amazon-eks.s3-us-west-2.amazonaws.com/${IAM_AUTHENTICATOR_VERSION}/bin/linux/amd64/aws-iam-authenticator /aws-cli-bin
 RUN chmod +x /aws-cli-bin/aws-iam-authenticator
 
+# https://docs.docker.com/install/linux/docker-ce/debian/
+FROM installer as docker
+RUN apt-get update && apt-get install -y \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg-agent \
+    software-properties-common
+COPY ./docker-public-key.asc /
+RUN apt-key add /docker-public-key.asc
+RUN add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/debian \
+   $(lsb_release -cs) \
+   stable"
+RUN apt-get update && apt-get install -y docker-ce-cli
 
 FROM installer as terraform
 ENV TERRAFORM_VERSION="0.12.24"
@@ -56,11 +71,13 @@ COPY --from=helm /usr/local/bin/helm /usr/local/bin/helm
 COPY --from=awscli /usr/local/aws-cli/ /usr/local/aws-cli/
 COPY --from=awscli /aws-cli-bin/ /usr/local/bin/
 COPY --from=terraform /usr/bin/terraform /usr/bin/terraform
+COPY --from=docker /usr/bin/docker /usr/bin/docker
 
 RUN kubectl help > /dev/null && echo kubectl ok
 RUN helm version
 RUN aws --version
 RUN terraform version
+RUN docker -v
 
 WORKDIR /config
 CMD bash
