@@ -34,7 +34,8 @@ RUN /aws/install --bin-dir /aws-cli-bin
 
 # https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html
 ENV IAM_AUTHENTICATOR_VERSION="1.15.10/2020-02-22"
-ADD https://amazon-eks.s3-us-west-2.amazonaws.com/${IAM_AUTHENTICATOR_VERSION}/bin/linux/amd64/aws-iam-authenticator /aws-cli-bin
+RUN curl -s https://amazon-eks.s3-us-west-2.amazonaws.com/${IAM_AUTHENTICATOR_VERSION}/bin/linux/amd64/aws-iam-authenticator \
+      > /aws-cli-bin/aws-iam-authenticator
 RUN chmod +x /aws-cli-bin/aws-iam-authenticator
 
 # https://docs.docker.com/install/linux/docker-ce/debian/
