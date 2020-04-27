@@ -61,12 +61,7 @@ RUN unzip /terraform.zip
 RUN chmod +x terraform
 RUN mv terraform /usr/bin/terraform
 
-FROM debian:10.3-slim
-RUN apt-get update && apt-get install -y \
-    bash \
-    curl \
-    git \
-  && rm -rf /var/lib/apt/lists/*
+FROM node:12
 COPY --from=kubectl /usr/local/bin/kubectl /usr/local/bin/kubectl
 COPY --from=helm /usr/local/bin/helm /usr/local/bin/helm
 COPY --from=awscli /usr/local/aws-cli/ /usr/local/aws-cli/
@@ -74,11 +69,14 @@ COPY --from=awscli /aws-cli-bin/ /usr/local/bin/
 COPY --from=terraform /usr/bin/terraform /usr/bin/terraform
 COPY --from=docker /usr/bin/docker /usr/bin/docker
 
-RUN kubectl help > /dev/null && echo kubectl ok
+RUN kubectl help > /dev/null
 RUN helm version
 RUN aws --version
 RUN terraform version
-RUN docker -v
+RUN docker --version
+RUN bash --version
+RUN curl --version
+RUN git --version
 
 WORKDIR /config
 CMD bash
