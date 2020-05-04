@@ -68,6 +68,11 @@ COPY --from=awscli /usr/local/aws-cli/ /usr/local/aws-cli/
 COPY --from=awscli /aws-cli-bin/ /usr/local/bin/
 COPY --from=terraform /usr/bin/terraform /usr/bin/terraform
 COPY --from=docker /usr/bin/docker /usr/bin/docker
+# Less and Groff required for some AWS CLI commands (eg: help and cloudfront)
+RUN apt-get update && apt-get install -y \
+    groff \
+    less \
+ && rm -rf /var/lib/apt/lists/*
 
 RUN kubectl help > /dev/null
 RUN helm version
