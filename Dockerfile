@@ -17,7 +17,7 @@ RUN chmod +x /usr/local/bin/kubectl
 # helm versions may be found at:
 # https://github.com/kubernetes/helm/releases
 FROM installer as helm
-ENV HELM_VERSION="v3.1.2"
+ENV HELM_VERSION="v3.2.1"
 RUN curl -s https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz | tar -xzO linux-amd64/helm > /usr/local/bin/helm
 RUN chmod +x /usr/local/bin/helm
 
