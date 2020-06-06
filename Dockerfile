@@ -61,12 +61,24 @@ RUN unzip /terraform.zip
 RUN chmod +x terraform
 RUN mv terraform /usr/bin/terraform
 
+# =====
+# Sops
+#
+FROM installer as sops
+ENV SOPS_VERSION="v3.5.0"
+RUN curl -sL "https://github.com/mozilla/sops/releases/download/${SOPS_VERSION}/sops-${SOPS_VERSION}.linux" > /sops
+RUN shasum -a 256 /sops
+ENV SOPS_SHA_256=610fca9687d1326ef2e1a66699a740f5dbd5ac8130190275959da737ec52f096
+RUN echo "${SOPS_SHA_256}  /sops" | shasum -c
+RUN chmod +x /sops
+
 FROM node:12
 COPY --from=kubectl /usr/local/bin/kubectl /usr/local/bin/kubectl
 COPY --from=helm /usr/local/bin/helm /usr/local/bin/helm
 COPY --from=awscli /usr/local/aws-cli/ /usr/local/aws-cli/
 COPY --from=awscli /aws-cli-bin/ /usr/local/bin/
 COPY --from=terraform /usr/bin/terraform /usr/bin/terraform
+COPY --from=sops /sops /usr/local/bin/sops
 COPY --from=docker /usr/bin/docker /usr/bin/docker
 # Less and Groff required for some AWS CLI commands (eg: help and cloudfront)
 RUN apt-get update && apt-get install -y \
@@ -78,6 +90,7 @@ RUN kubectl help > /dev/null
 RUN helm version
 RUN aws --version
 RUN terraform version
+RUN sops --version
 RUN docker --version
 RUN bash --version
 RUN curl --version
