@@ -100,7 +100,7 @@ RUN chmod +x /sops
 # =====
 # Deployer
 #
-FROM node:12
+FROM node:14
 # Less and Groff required for some AWS CLI commands (eg: help and cloudfront)
 RUN apt-get update && apt-get install -y \
     groff \
