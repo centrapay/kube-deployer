@@ -105,6 +105,7 @@ FROM node:14
 RUN apt-get update && apt-get install -y \
     groff \
     less \
+    jq \
  && rm -rf /var/lib/apt/lists/*
 COPY --from=kubectl /usr/local/bin/kubectl /usr/local/bin/kubectl
 COPY --from=helm /usr/local/bin/helm /usr/local/bin/helm
@@ -123,6 +124,7 @@ RUN docker --version
 RUN bash --version
 RUN curl --version
 RUN git --version
+RUN jq --version
 
 WORKDIR /config
 CMD bash
