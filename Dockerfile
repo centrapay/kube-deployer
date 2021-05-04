@@ -13,11 +13,11 @@ RUN apt-get update && apt-get install -y \
 # kubectl versions may be found at:
 # https://github.com/kubernetes/kubernetes/releases
 FROM installer as kubectl
-ENV KUBE_VERSION="v1.17.4"
-RUN curl -s https://storage.googleapis.com/kubernetes-release/release/${KUBE_VERSION}/bin/linux/amd64/kubectl > /usr/local/bin/kubectl
-RUN shasum -a 256 /usr/local/bin/kubectl
-ENV KUBECTL_SHA_256=465b2d2bd7512b173860c6907d8127ee76a19a385aa7865608e57a5eebe23597
-RUN echo "${KUBECTL_SHA_256}  /usr/local/bin/kubectl" | shasum -c
+ENV KUBE_VERSION="v1.20.6"
+RUN curl -s https://storage.googleapis.com/kubernetes-release/release/v1.20.6/bin/linux/amd64/kubectl > /usr/local/bin/kubectl
+RUN shasum -a 512 /usr/local/bin/kubectl
+ENV KUBECTL_SHA_512=43389770aae4df9de785730fcde8223f33c08b6a34251e431e474b30932c2618c5a38ba65b4a7e2c68eb564ffde59efb28b74d659268ae287e79919698442a66
+RUN echo "${KUBECTL_SHA_512}  /usr/local/bin/kubectl" | shasum -c
 RUN chmod +x /usr/local/bin/kubectl
 
 # =====
@@ -26,10 +26,10 @@ RUN chmod +x /usr/local/bin/kubectl
 # helm versions may be found at:
 # https://github.com/kubernetes/helm/releases
 FROM installer as helm
-ENV HELM_VERSION="v3.2.1"
+ENV HELM_VERSION="v3.5.4"
 RUN curl -s https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz | tar -xzO linux-amd64/helm > /usr/local/bin/helm
 RUN shasum -a 256 /usr/local/bin/helm
-ENV HELM_SHA_256=98c57f2b86493dd36ebaab98990e6d5117510f5efbf21c3344c3bdc91a4f947c
+ENV HELM_SHA_256=ef10138e72714e5f48be2dc0173bfb0e03a2b7d9df60c850544d10690bbe9e8b
 RUN echo "${HELM_SHA_256}  /usr/local/bin/helm" | shasum -c
 RUN chmod +x /usr/local/bin/helm
 
@@ -77,11 +77,12 @@ RUN apt-get update && apt-get install -y docker-ce-cli
 # =====
 # Terraform
 #
+# https://github.com/hashicorp/terraform/releases
 FROM installer as terraform
-ENV TERRAFORM_VERSION="0.12.24"
+ENV TERRAFORM_VERSION="0.12.31"
 RUN curl -sL "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip" > /terraform.zip
 RUN shasum -a 256 /terraform.zip
-ENV TERRAFORM_SHA_256=602d2529aafdaa0f605c06adb7c72cfb585d8aa19b3f4d8d189b42589e27bf11
+ENV TERRAFORM_SHA_256=e5eeba803bc7d8d0cae7ef04ba7c3541c0abd8f9e934a5e3297bf738b31c5c6d
 RUN echo "${TERRAFORM_SHA_256}  /terraform.zip" | shasum -c
 RUN unzip /terraform.zip
 RUN chmod +x terraform
