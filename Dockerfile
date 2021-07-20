@@ -79,10 +79,10 @@ RUN apt-get update && apt-get install -y docker-ce-cli
 #
 # https://github.com/hashicorp/terraform/releases
 FROM installer as terraform
-ENV TERRAFORM_VERSION="0.14.11"
+ENV TERRAFORM_VERSION="0.15.5"
 RUN curl -sL "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip" > /terraform.zip
 RUN shasum -a 256 /terraform.zip
-ENV TERRAFORM_SHA_256=171ef5a4691b6f86eab524feaf9a52d5221c875478bd63dd7e55fef3939f7fd4
+ENV TERRAFORM_SHA_256=3b144499e08c245a8039027eb2b84c0495e119f57d79e8fb605864bb48897a7d
 RUN echo "${TERRAFORM_SHA_256}  /terraform.zip" | shasum -c
 RUN unzip /terraform.zip
 RUN chmod +x terraform
