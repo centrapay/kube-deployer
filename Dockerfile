@@ -34,6 +34,21 @@ RUN echo "${HELM_SHA_256}  /usr/local/bin/helm" | shasum -c
 RUN chmod +x /usr/local/bin/helm
 
 # =====
+# Kubeval
+#
+# kubeval versions may be found at:
+# https://github.com/instrumenta/kubeval/releases
+FROM installer as kubeval
+ENV KUBEVAL_URL="https://github.com/instrumenta/kubeval/releases/download/v0.16.1/kubeval-linux-amd64.tar.gz"
+RUN curl -Ls "${KUBEVAL_URL}" > kubeval.tar.gz
+RUN tar -xzf kubeval.tar.gz
+RUN mv kubeval /usr/local/bin/kubeval
+RUN shasum -a 512 /usr/local/bin/kubeval
+ENV KUBEVAL_SHA_512=74964fe7ee96f445597c904ba18b14fdbdd78c1bd69c838d6798d0c5b3ba398d01ad3c3319f08ae8241bc28d11b29b6a562546d4f5580221fda96a2b3bb34002
+RUN echo "${KUBEVAL_SHA_512}  /usr/local/bin/kubeval" | shasum -c
+RUN chmod +x /usr/local/bin/kubeval
+
+# =====
 # AWS CLI
 #
 # https://github.com/aws/aws-cli/blob/v2/docker/Dockerfile
@@ -115,9 +130,11 @@ COPY --from=awscli /aws-cli-bin/ /usr/local/bin/
 COPY --from=terraform /terraform /usr/local/bin/terraform
 COPY --from=sops /sops /usr/local/bin/sops
 COPY --from=docker /usr/bin/docker /usr/local/bin/docker
+COPY --from=kubeval /usr/local/bin/kubeval /usr/local/bin/kubeval
 
 RUN kubectl help > /dev/null
 RUN helm version
+RUN kubeval --version
 RUN aws --version
 RUN terraform version
 RUN sops --version
