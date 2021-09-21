@@ -1,0 +1,21 @@
+on:
+  push:
+    tags:
+
+jobs:
+  publish:
+    env:
+      image_tag_versioned: "centrapay/kube-deployer:${{ github.ref }}"
+      image_tag_latest: "centrapay/kube-deployer:latest"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: '
+        echo ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }} |
+          docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
+        '
+      - docker build -t "${image_tag_versioned}" .
+      - docker tag "${image_tag_versioned}" "${image_tag_latest}"
+      - docker push "${image_tag_versioned}"
+      - docker push "${image_tag_latest}"
+
