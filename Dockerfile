@@ -1,4 +1,4 @@
-FROM debian:10.3-slim as installer
+FROM debian:bullseye-slim as installer
 RUN apt-get update && apt-get install -y \
     bash \
     curl \
@@ -105,7 +105,7 @@ RUN chmod +x terraform
 # =====
 # Deployer
 #
-FROM node:14
+FROM node:14-bullseye
 # Less and Groff required for some AWS CLI commands (eg: help and cloudfront)
 RUN apt-get update && apt-get install -y \
     groff \
