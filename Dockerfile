@@ -102,6 +102,19 @@ RUN echo "${TERRAFORM_SHA_256}  /terraform.zip" | shasum -c
 RUN unzip /terraform.zip
 RUN chmod +x terraform
 
+# ====
+# AWS Sam Deployer
+#
+# https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html
+FROM installer as samcli
+RUN apt-get update \
+  && apt-get install -y \
+     python3 \
+     python3-pip \
+  && rm -rf /var/lib/apt/lists/*
+RUN pip3 install aws-sam-cli \
+  && rm -rf /root/.cache/pip
+
 # =====
 # Deployer
 #
@@ -119,6 +132,8 @@ COPY --from=awscli /aws-cli-bin/ /usr/local/bin/
 COPY --from=terraform /terraform /usr/local/bin/terraform
 COPY --from=docker /usr/bin/docker /usr/local/bin/docker
 COPY --from=kubeval /usr/local/bin/kubeval /usr/local/bin/kubeval
+COPY --from=samcli /usr/local/bin/sam /usr/local/bin/sam
+COPY --from=samcli /usr/local/lib/python3.9 /usr/local/lib/python3.9
 
 RUN kubectl help > /dev/null
 RUN helm version
@@ -130,6 +145,7 @@ RUN bash --version
 RUN curl --version
 RUN git --version
 RUN jq --version
+RUN sam --version
 
 WORKDIR /config
 CMD bash
