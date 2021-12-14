@@ -103,17 +103,6 @@ RUN unzip /terraform.zip
 RUN chmod +x terraform
 
 # =====
-# Sops
-#
-FROM installer as sops
-ENV SOPS_VERSION="v3.5.0"
-RUN curl -sL "https://github.com/mozilla/sops/releases/download/${SOPS_VERSION}/sops-${SOPS_VERSION}.linux" > /sops
-RUN shasum -a 256 /sops
-ENV SOPS_SHA_256=610fca9687d1326ef2e1a66699a740f5dbd5ac8130190275959da737ec52f096
-RUN echo "${SOPS_SHA_256}  /sops" | shasum -c
-RUN chmod +x /sops
-
-# =====
 # Deployer
 #
 FROM node:14
@@ -128,7 +117,6 @@ COPY --from=helm /usr/local/bin/helm /usr/local/bin/helm
 COPY --from=awscli /usr/local/aws-cli/ /usr/local/aws-cli/
 COPY --from=awscli /aws-cli-bin/ /usr/local/bin/
 COPY --from=terraform /terraform /usr/local/bin/terraform
-COPY --from=sops /sops /usr/local/bin/sops
 COPY --from=docker /usr/bin/docker /usr/local/bin/docker
 COPY --from=kubeval /usr/local/bin/kubeval /usr/local/bin/kubeval
 
@@ -137,7 +125,6 @@ RUN helm version
 RUN kubeval --version
 RUN aws --version
 RUN terraform version
-RUN sops --version
 RUN docker --version
 RUN bash --version
 RUN curl --version
