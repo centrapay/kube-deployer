@@ -14,6 +14,7 @@ This includes:
 - bash
 - curl
 - git
+- sam
 - jq
 
 # How do I do a new release?
