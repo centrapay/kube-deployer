@@ -13,10 +13,10 @@ RUN apt-get update && apt-get install -y \
 # kubectl versions may be found at:
 # https://github.com/kubernetes/kubernetes/releases
 FROM installer as kubectl
-ENV KUBE_VERSION="v1.20.6"
-RUN curl -s https://storage.googleapis.com/kubernetes-release/release/v1.20.6/bin/linux/amd64/kubectl > /usr/local/bin/kubectl
+ENV KUBE_VERSION="v1.21.11"
+RUN curl -s https://storage.googleapis.com/kubernetes-release/release/${KUBE_VERSION}/bin/linux/amd64/kubectl > /usr/local/bin/kubectl
 RUN shasum -a 512 /usr/local/bin/kubectl
-ENV KUBECTL_SHA_512=43389770aae4df9de785730fcde8223f33c08b6a34251e431e474b30932c2618c5a38ba65b4a7e2c68eb564ffde59efb28b74d659268ae287e79919698442a66
+ENV KUBECTL_SHA_512=82cd205c0ecb6660a0c4915b8f58b79ba94ad1c1ddf05491345b7c671ef6f1b1fb78c13c7968d4ddd2a712de43b4b67a587c1aeef36325e53f3b15871a13d132
 RUN echo "${KUBECTL_SHA_512}  /usr/local/bin/kubectl" | shasum -c
 RUN chmod +x /usr/local/bin/kubectl
 
@@ -26,10 +26,10 @@ RUN chmod +x /usr/local/bin/kubectl
 # helm versions may be found at:
 # https://github.com/kubernetes/helm/releases
 FROM installer as helm
-ENV HELM_VERSION="v3.5.4"
+ENV HELM_VERSION="v3.8.1"
 RUN curl -s https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz | tar -xzO linux-amd64/helm > /usr/local/bin/helm
 RUN shasum -a 256 /usr/local/bin/helm
-ENV HELM_SHA_256=ef10138e72714e5f48be2dc0173bfb0e03a2b7d9df60c850544d10690bbe9e8b
+ENV HELM_SHA_256=1fe973bb32db1dcacdda9cda150e71e47b517a2af6bfdc8a2735859c8070a0b6
 RUN echo "${HELM_SHA_256}  /usr/local/bin/helm" | shasum -c
 RUN chmod +x /usr/local/bin/helm
 
