@@ -21,3 +21,5 @@ This includes:
 
 Create a git tag that starts with 1.x and it'll show up in GH Actions. This
 will build the image and push it to the Centrapay namespace on dockerhub.
+
+test
