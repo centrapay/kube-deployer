@@ -118,7 +118,7 @@ RUN pip3 install aws-sam-cli \
 # =====
 # Deployer
 #
-FROM node:14-bullseye
+FROM node:18-bullseye
 # Less and Groff required for some AWS CLI commands (eg: help and cloudfront)
 RUN apt-get update && apt-get install -y \
     groff \
