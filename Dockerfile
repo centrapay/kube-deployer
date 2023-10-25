@@ -73,21 +73,20 @@ RUN chmod +x /aws-cli-bin/aws-iam-authenticator
 # =====
 # Docker
 #
-# https://docs.docker.com/install/linux/docker-ce/debian/
+# https://docs.docker.com/engine/install/debian/
 FROM installer as docker
-RUN apt-get update && apt-get install -y \
-    apt-transport-https \
-    ca-certificates \
-    curl \
-    gnupg-agent \
-    software-properties-common
-COPY ./docker-public-key.asc /
-RUN apt-key add /docker-public-key.asc
-RUN add-apt-repository \
-   "deb [arch=amd64] https://download.docker.com/linux/debian \
-   $(lsb_release -cs) \
-   stable"
-RUN apt-get update && apt-get install -y docker-ce-cli
+# Add Docker's official GPG key:
+ENV DOCKER_VERSION_STRING=5:24.0.6-1~debian.11~bullseye
+RUN apt-get update && apt-get install ca-certificates gnupg
+RUN install -m 0755 -d /etc/apt/keyrings
+RUN curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+RUN chmod a+r /etc/apt/keyrings/docker.gpg
+# Add the repository to Apt sources:
+RUN echo \
+  "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian bullseye stable" | \
+  tee /etc/apt/sources.list.d/docker.list > /dev/null
+# Install Docker
+RUN apt-get update && apt-get install -y docker-ce-cli=$DOCKER_VERSION_STRING && rm -rf /var/lib/apt/lists/*
 
 # =====
 # Terraform
@@ -115,6 +114,14 @@ RUN apt-get update \
 RUN pip3 install aws-sam-cli \
   && rm -rf /root/.cache/pip
 
+# ====
+# General Tools
+#
+# yq - https://github.com/mikefarah/yq
+FROM installer as tools
+RUN curl -sL "https://github.com/mikefarah/yq/releases/download/v4.35.2/yq_linux_amd64" > yq
+RUN chmod +x yq
+
 # =====
 # Deployer
 #
@@ -134,6 +141,7 @@ COPY --from=docker /usr/bin/docker /usr/local/bin/docker
 COPY --from=kubeval /usr/local/bin/kubeval /usr/local/bin/kubeval
 COPY --from=samcli /usr/local/bin/sam /usr/local/bin/sam
 COPY --from=samcli /usr/local/lib/python3.9 /usr/local/lib/python3.9
+COPY --from=tools /yq /usr/local/bin/yq
 
 RUN kubectl help > /dev/null
 RUN helm version
@@ -146,6 +154,7 @@ RUN curl --version
 RUN git --version
 RUN jq --version
 RUN sam --version
+RUN yq --version
 
 WORKDIR /config
 CMD bash
