@@ -119,7 +119,9 @@ RUN pip3 install aws-sam-cli \
 #
 # yq - https://github.com/mikefarah/yq
 FROM installer as tools
+ENV YQ_SHA_256=8afd786b3b8ba8053409c5e7d154403e2d4ed4cf3e93c237462dc9ef75f38c8d
 RUN curl -sL "https://github.com/mikefarah/yq/releases/download/v4.35.2/yq_linux_amd64" > yq
+RUN echo "${YQ_SHA_256}  yq" | shasum -c
 RUN chmod +x yq
 
 # =====
