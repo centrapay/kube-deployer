@@ -114,6 +114,20 @@ RUN apt-get update \
 RUN pip3 install aws-sam-cli \
   && rm -rf /root/.cache/pip
 
+# =====
+# Kubeconform
+#
+# kubeconform versions may be found at:
+# https://github.com/yannh/kubeconform/releases
+FROM installer as kubeconform
+ENV KUBECONFORM_URL="https://github.com/yannh/kubeconform/releases/download/v0.6.4/kubeconform-linux-amd64.tar.gz"
+RUN curl -Ls "${KUBECONFORM_URL}" > kubeconform.tar.gz
+RUN tar -xvzf kubeconform.tar.gz
+RUN mv kubeconform /usr/local/bin/kubeconform
+ENV KUBECONFORM_SHA_256=d095722bf8032abec604dbb2c68f7c77fee55a5b770d1f96d5e3988b3c5faae5
+RUN echo "${KUBECONFORM_SHA_256}  /usr/local/bin/kubeconform" | shasum -a 256 -c
+RUN chmod +x /usr/local/bin/kubeconform
+
 # ====
 # General Tools
 #
@@ -141,6 +155,7 @@ COPY --from=awscli /aws-cli-bin/ /usr/local/bin/
 COPY --from=terraform /terraform /usr/local/bin/terraform
 COPY --from=docker /usr/bin/docker /usr/local/bin/docker
 COPY --from=kubeval /usr/local/bin/kubeval /usr/local/bin/kubeval
+COPY --from=kubeconform /usr/local/bin/kubeconform /usr/local/bin/kubeconform
 COPY --from=samcli /usr/local/bin/sam /usr/local/bin/sam
 COPY --from=samcli /usr/local/lib/python3.9 /usr/local/lib/python3.9
 COPY --from=tools /yq /usr/local/bin/yq
@@ -148,6 +163,7 @@ COPY --from=tools /yq /usr/local/bin/yq
 RUN kubectl help > /dev/null
 RUN helm version
 RUN kubeval --version
+RUN kubeconform -v
 RUN aws --version
 RUN terraform version
 RUN docker --version
